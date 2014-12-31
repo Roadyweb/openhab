@@ -22,8 +22,7 @@ public class TestSHCMessage {
 
 	@Before
 	public void setUp() throws Exception {
-		File file = new File(
-				"/home/jbolay/git/openhab/bundles/binding/org.openhab.binding.smarthomatic/xml/packet_layout.xml");
+		File file = new File("xml/packet_layout.xml");
 		JAXBContext jaxbContext = JAXBContext.newInstance(Packet.class);
 
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();

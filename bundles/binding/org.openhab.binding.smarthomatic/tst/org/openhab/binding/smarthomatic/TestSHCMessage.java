@@ -127,7 +127,7 @@ public class TestSHCMessage {
 	 * Test Daten sind generic battery: 127
 	 */
 	@Test
-	public void testGPIODigitalPin() {
+	public void testGenericBattMax() {
 		String message = " Packet Data: SenderID=10;PacketCounter=164;MessageType=8;MessageGroupID=0;MessageID=5;MessageData=FE0000000004;Percentage=66;";
 		SHCMessage shcMessage = new SHCMessage(message, packet);
 		List<Type> values = shcMessage.getData().getOpenHABTypes();
@@ -138,7 +138,7 @@ public class TestSHCMessage {
 	 * Test Daten sind GPIO DigitalPort: 00000000b
 	 */
 	@Test
-	public void testGPIOAllZero() {
+	public void testGPIODigitalPortAllZero() {
 		String message = " Packet Data: SenderID=150;PacketCounter=1688;MessageType=8;MessageGroupID=1;MessageID=1;MessageData=000000000004;";
 		SHCMessage shcMessage = new SHCMessage(message, packet);
 		List<Type> values = shcMessage.getData().getOpenHABTypes();
@@ -152,7 +152,7 @@ public class TestSHCMessage {
 	 * Test Daten sind GPIO DigitalPort: 11111111b
 	 */
 	@Test
-	public void testGPIOAllOn() {
+	public void testGPIODigitalPortAllOn() {
 		String message = " Packet Data: SenderID=150;PacketCounter=1688;MessageType=8;MessageGroupID=1;MessageID=1;MessageData=ff0000000004;";
 		SHCMessage shcMessage = new SHCMessage(message, packet);
 		List<Type> values = shcMessage.getData().getOpenHABTypes();
@@ -166,7 +166,7 @@ public class TestSHCMessage {
 	 * Test Daten sind GPIO DigitalPort: 10100101b
 	 */
 	@Test
-	public void testGPIOAllMixed() {
+	public void testGPIODigitalPortAllMixed() {
 		String message = " Packet Data: SenderID=150;PacketCounter=1688;MessageType=8;MessageGroupID=1;MessageID=1;MessageData=a50000000004;";
 		SHCMessage shcMessage = new SHCMessage(message, packet);
 		List<Type> values = shcMessage.getData().getOpenHABTypes();
@@ -179,6 +179,63 @@ public class TestSHCMessage {
 		Assert.assertEquals(OnOffType.ON, values.get(5));
 		Assert.assertEquals(OnOffType.OFF, values.get(6));
 		Assert.assertEquals(OnOffType.ON, values.get(7));
+	}
+
+	/**
+	 * Test Daten sind GPIO AnalogPort: 00000000000000000000000000000000000000000000
+	 */
+	@Test
+	public void testGPIOAnalogPortAllZero() {
+		String message = " Packet Data: SenderID=11;PacketCounter=2238;MessageType=8;MessageGroupID=1;MessageID=10;MessageData=00000000000000000000000000000000000000000000;";
+		SHCMessage shcMessage = new SHCMessage(message, packet);
+		List<Type> values = shcMessage.getData().getOpenHABTypes();
+		Assert.assertEquals(16, values.size());
+		for (int i = 0; i < values.size(); i += 2) {
+			Assert.assertEquals(OnOffType.OFF, values.get(i));
+			Assert.assertEquals(0, ((DecimalType) values.get(i + 1)).intValue());
+		}
+	}
+	
+	/**
+	 * Test Daten sind GPIO AnalogPort: FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+	 */
+	@Test
+	public void testGPIOAnalogPortAllMax() {
+		String message = " Packet Data: SenderID=11;PacketCounter=2238;MessageType=8;MessageGroupID=1;MessageID=10;MessageData=FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;";
+		SHCMessage shcMessage = new SHCMessage(message, packet);
+		List<Type> values = shcMessage.getData().getOpenHABTypes();
+		Assert.assertEquals(16, values.size());
+		for (int i = 0; i < values.size(); i += 2) {
+			Assert.assertEquals(OnOffType.ON, values.get(i));
+			Assert.assertEquals(2047, ((DecimalType) values.get(i + 1)).intValue());
+		}
+	}
+
+	/**
+	 * Test Daten sind GPIO AnalogPort: c4c000c4c0008000010FF2FF00000000000000000000
+	 */
+	@Test
+	public void testGPIOAnalogPortAllMixed() {
+		String message = " Packet Data: SenderID=11;PacketCounter=2238;MessageType=8;MessageGroupID=1;MessageID=10;MessageData=c4c000c4c0008000010FF2FF00000000000000000000;";
+		SHCMessage shcMessage = new SHCMessage(message, packet);
+		List<Type> values = shcMessage.getData().getOpenHABTypes();
+		Assert.assertEquals(16, values.size());
+		Assert.assertEquals("Port0", OnOffType.ON, values.get(0));
+		Assert.assertEquals("Port0", 1100, ((DecimalType) values.get(1)).intValue());
+		Assert.assertEquals("Port1", OnOffType.OFF, values.get(2));
+		Assert.assertEquals("Port1", 0, ((DecimalType) values.get(3)).intValue());
+		Assert.assertEquals("Port2", OnOffType.ON, values.get(4));
+		Assert.assertEquals("Port2", 1100, ((DecimalType) values.get(5)).intValue());
+		Assert.assertEquals("Port3", OnOffType.OFF, values.get(6));
+		Assert.assertEquals("Port3", 0, ((DecimalType) values.get(7)).intValue());
+		Assert.assertEquals("Port4", OnOffType.ON, values.get(8));
+		Assert.assertEquals("Port4", 0, ((DecimalType) values.get(9)).intValue());
+		Assert.assertEquals("Port5", OnOffType.OFF, values.get(10));
+		Assert.assertEquals("Port5", 1, ((DecimalType) values.get(11)).intValue());
+		Assert.assertEquals("Port6", OnOffType.OFF, values.get(12));
+		Assert.assertEquals("Port6", 255, ((DecimalType) values.get(13)).intValue());
+		Assert.assertEquals("Port7", OnOffType.OFF, values.get(14));
+		Assert.assertEquals("Port7", 767, ((DecimalType) values.get(15)).intValue());
 	}
 
 	/**

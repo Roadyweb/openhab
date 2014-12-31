@@ -25,8 +25,6 @@ public interface SmarthomaticBindingProvider extends BindingProvider {
 
 	public int getMessagePartId(String itemName);
 
-	public int getMessageItemId(String itemName);
-
 	public Item getItem(String itemName);
 
 	public String getConfigParam(String itemName, String paramName);

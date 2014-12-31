@@ -170,20 +170,16 @@ public class SHCMessage {
 						openHABTypes.add(OnOffType.OFF);
 					}
 					startBit += 1;
-					System.out.print("Yes we have an array");
-
 				} else if (object instanceof Array) {
 					Array value = (Array) object;
-					System.out.print("Yes we have an array");
 					Object object2 = value.getArrayDataValue();
 					for (int i = 0; i < value.getLength(); i++) {
-						System.out.print(i);
 						startBit = getDataValues(startBit,
 								value.getArrayDataValue(), data);
 					}
 
 				} else {
-					System.out.print("Hallo ich bin hier");
+					// TODO: add other types
 				}
 			}
 			return startBit;

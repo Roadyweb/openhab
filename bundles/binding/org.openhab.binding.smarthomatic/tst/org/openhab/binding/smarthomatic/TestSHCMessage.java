@@ -412,6 +412,39 @@ public class TestSHCMessage {
 		Assert.assertEquals(16383, ((DecimalType) values.get(0)).intValue());
 	}
 	/**
+	 * Test Daten sind Dimmer Brightness: 13 (typ)
+	 */
+	@Test
+	public void testDimmerBrightnessTyp() {
+		String message = " Packet Data: SenderID=13;PacketCounter=301;MessageType=8;MessageGroupID=60;MessageID=1;MessageData=1A0000000004;";
+		SHCMessage shcMessage = new SHCMessage(message, packet);
+		List<Type> values = shcMessage.getData().getOpenHABTypes();
+		Assert.assertEquals(13, ((DecimalType) values.get(0)).intValue());
+	}
+
+	/**
+	 * Test Daten sind Dimmer Brightness: 0 (min)
+	 */
+	@Test
+	public void testDimmerBrightnessMin() {
+		String message = " Packet Data: SenderID=13;PacketCounter=301;MessageType=8;MessageGroupID=60;MessageID=1;MessageData=000000000004;";
+		SHCMessage shcMessage = new SHCMessage(message, packet);
+		List<Type> values = shcMessage.getData().getOpenHABTypes();
+		Assert.assertEquals(0, ((DecimalType) values.get(0)).intValue());
+	}
+
+	/**
+	 * Test Daten sind Dimmer Brightness: 100 (max)
+	 */
+	@Test
+	public void testDimmerBrightnessMax() {
+		String message = " Packet Data: SenderID=13;PacketCounter=301;MessageType=8;MessageGroupID=60;MessageID=1;MessageData=C80000000004;";
+		SHCMessage shcMessage = new SHCMessage(message, packet);
+		List<Type> values = shcMessage.getData().getOpenHABTypes();
+		Assert.assertEquals(100, ((DecimalType) values.get(0)).intValue());
+	}
+	
+	/**
 	 * Test Daten sind Dimmer Color: 13 (typ)
 	 */
 	@Test

@@ -90,6 +90,12 @@ public class BaseStation implements SerialEventWorker {
 			brightness = brightness << 1;
 			messageData = Integer.toHexString(brightness);
 		} else
+		// Dimmer Animation Message
+		if (messageGroupId == 60 && messageId == 2
+				&& command instanceof DecimalType) {
+			int setting = ((DecimalType) command).intValue();
+			messageData = genHexString(setting, 8);
+		} else
 		// Powerswitch
 		if (messageId == 20) {
 			cmd = "s0002"

@@ -12,6 +12,7 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.openhab.binding.smarthomatic.internal.packetData.Array;
 import org.openhab.binding.smarthomatic.internal.packetData.BoolValue;
+import org.openhab.binding.smarthomatic.internal.packetData.EnumValue;
 import org.openhab.binding.smarthomatic.internal.packetData.IntValue;
 import org.openhab.binding.smarthomatic.internal.packetData.Packet;
 import org.openhab.binding.smarthomatic.internal.packetData.Packet.MessageGroup;
@@ -161,15 +162,20 @@ public class SHCMessage {
 							true);
 					openHABTypes.add(new DecimalType(result));
 					startBit += value.getBits();
-
 				} else if (object instanceof BoolValue) {
-					Integer parseData = parseData(data, 1, startBit, false);
-					if (parseData > 0) {
+					Integer value = parseData(data, 1, startBit, false);
+					if (value > 0) {
 						openHABTypes.add(OnOffType.ON);
 					} else {
 						openHABTypes.add(OnOffType.OFF);
 					}
 					startBit += 1;
+				} else if (object instanceof EnumValue) {
+					EnumValue value = (EnumValue) object;
+					Integer result = parseData(data, value.getBits(), startBit,
+							false);
+					openHABTypes.add(new DecimalType(result));
+					startBit += value.getBits();
 				} else if (object instanceof Array) {
 					Array value = (Array) object;
 					Object object2 = value.getArrayDataValue();
@@ -177,9 +183,8 @@ public class SHCMessage {
 						startBit = getDataValues(startBit,
 								value.getArrayDataValue(), data);
 					}
-
 				} else {
-					// TODO: add other types
+					logger.warn("TODO: Unsupported datatype");
 				}
 			}
 			return startBit;

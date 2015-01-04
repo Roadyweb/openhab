@@ -78,10 +78,15 @@ public class BaseStation implements SerialEventWorker {
 		String cmd = "";
 		String messageData = "";
 		// RGB Dimmer Color Message
-		if (messageGroupId == 60 && messageId == 10
-				&& command instanceof HSBType) {
-			ShcColor translateColor = translateColor((HSBType) command);
-			messageData = translateColor.toString();
+		if (messageGroupId == 60 && messageId == 10) {
+			if (command instanceof HSBType) {
+				ShcColor translateColor = translateColor((HSBType) command);
+				messageData = translateColor.toString();
+			} else if (command instanceof DecimalType){
+				int color = ((DecimalType) command).intValue();
+				color = color << 2;   // 6 bits
+				messageData = genHexString(color,2);
+			}
 		} else
 		// Dimmer Brightness Message
 		if (messageGroupId == 60 && messageId == 1

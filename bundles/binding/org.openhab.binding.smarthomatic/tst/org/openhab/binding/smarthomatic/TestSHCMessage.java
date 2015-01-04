@@ -445,6 +445,47 @@ public class TestSHCMessage {
 	}
 	
 	/**
+	 * Test Daten sind Dimmer Animation: 13 (typ)
+	 */
+	@Test
+	public void testDimmerAnimationTyp() {
+		String message = " Packet Data: SenderID=13;PacketCounter=534;MessageType=10;AckSenderID=0;AckPacketCounter=2379;Error=0;MessageGroupID=60;MessageID=2;MessageData=40f4006000000000000000000000000000;";
+		SHCMessage shcMessage = new SHCMessage(message, packet);
+		List<Type> values = shcMessage.getData().getOpenHABTypes();
+		Assert.assertEquals("AnimationMode", 1, ((DecimalType) values.get(0)).intValue());
+		Assert.assertEquals("TimeoutSec", 976, ((DecimalType) values.get(1)).intValue());
+		Assert.assertEquals("StartBrightness", 0, ((DecimalType) values.get(2)).intValue());
+		Assert.assertEquals("EndBrightness", 96, ((DecimalType) values.get(3)).intValue());
+	}
+
+	/**
+	 * Test Daten sind Dimmer Animation: 0 (min)
+	 */
+	@Test
+	public void testDimmerAnimationMin() {
+		String message = " Packet Data: SenderID=13;PacketCounter=534;MessageType=10;AckSenderID=0;AckPacketCounter=2379;Error=0;MessageGroupID=60;MessageID=2;MessageData=0000000000000000000000000000000000;";
+		SHCMessage shcMessage = new SHCMessage(message, packet);
+		List<Type> values = shcMessage.getData().getOpenHABTypes();
+		Assert.assertEquals("AnimationMode", 0, ((DecimalType) values.get(0)).intValue());
+		Assert.assertEquals("TimeoutSec", 0, ((DecimalType) values.get(1)).intValue());
+		Assert.assertEquals("StartBrightness", 0, ((DecimalType) values.get(2)).intValue());
+		Assert.assertEquals("EndBrightness", 0, ((DecimalType) values.get(3)).intValue());
+	}
+
+	/**
+	 * Test Daten sind Dimmer Animation: 100 (max)
+	 */
+	@Test
+	public void testDimmerAnimationMax() {
+		String message = " Packet Data: SenderID=13;PacketCounter=534;MessageType=10;AckSenderID=0;AckPacketCounter=2379;Error=0;MessageGroupID=60;MessageID=2;MessageData=7ffff20000000000000000000000000000;";
+		SHCMessage shcMessage = new SHCMessage(message, packet);
+		List<Type> values = shcMessage.getData().getOpenHABTypes();
+		Assert.assertEquals("AnimationMode", 1, ((DecimalType) values.get(0)).intValue());
+		Assert.assertEquals("TimeoutSec", 65535, ((DecimalType) values.get(1)).intValue());
+		Assert.assertEquals("StartBrightness", 100, ((DecimalType) values.get(2)).intValue());
+		Assert.assertEquals("EndBrightness", 0, ((DecimalType) values.get(3)).intValue());
+	}
+	/**
 	 * Test Daten sind Dimmer Color: 13 (typ)
 	 */
 	@Test

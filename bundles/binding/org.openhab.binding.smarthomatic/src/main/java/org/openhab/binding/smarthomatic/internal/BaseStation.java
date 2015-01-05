@@ -73,32 +73,29 @@ public class BaseStation implements SerialEventWorker {
 		return s;
 	}
 
-	public void sendCommand(int deviceID, int messageGroupId, int messageId,
-			int toggleTime, Command command) {
+	public String prepareCommand(int deviceID, int messageGroupId,
+			int messageId, int toggleTime, Command command) {
 		String cmd = "";
 		String messageData = "";
-		// RGB Dimmer Color Message
-		if (messageGroupId == 60 && messageId == 10) {
-			if (command instanceof HSBType) {
-				ShcColor translateColor = translateColor((HSBType) command);
-				messageData = translateColor.toString();
-			} else if (command instanceof DecimalType){
-				int color = ((DecimalType) command).intValue();
-				color = color << 2;   // 6 bits
-				messageData = genHexString(color,2);
-			}
-		} else
-		// Dimmer Brightness Message
-		if (messageGroupId == 60 && messageId == 11
+		// GPIO Digital Port Message
+		if (messageGroupId == 1 && messageId == 1
 				&& command instanceof DecimalType) {
 			int setting = ((DecimalType) command).intValue();
-			/* TODO: Right now only two time-color pairs are supported in
-			 * this implemenation. It is unclear to me how to handle 115 bits
-			 * that are required for the complete message consisting of 10
-			 * time-color pairs which gives an integer the size of 2^115
-			 */
-			setting = setting << 5;
-			messageData = Integer.toHexString(setting);
+			// message data length = 8 bits, no need to shift
+			messageData = genHexString(setting, 2);
+		} else
+		// GPIO Digital Pin Message
+		if (messageGroupId == 1 && messageId == 5
+				&& command instanceof DecimalType) {
+			int setting = ((DecimalType) command).intValue();
+			messageData = genHexString(setting, 1);
+		} else
+		// GPIO Digital Pin Timeout Message
+		if (messageGroupId == 1 && messageId == 6
+			&& command instanceof DecimalType) {
+			int setting = ((DecimalType) command).intValue();
+			setting = setting << 4;  // message data length = 20 bits
+			messageData = genHexString(setting, 5);
 		} else
 		// Dimmer Brightness Message
 		if (messageGroupId == 60 && messageId == 1
@@ -113,35 +110,44 @@ public class BaseStation implements SerialEventWorker {
 			int setting = ((DecimalType) command).intValue();
 			messageData = genHexString(setting, 8);
 		} else
-		// GPIO Digital Port Message
-		if (messageGroupId == 1 && messageId == 1
-				&& command instanceof DecimalType) {
-			int setting = ((DecimalType) command).intValue();
-			// message data length = 8 bits, no need to shift
-			messageData = genHexString(setting, 2);
+		// RGB Dimmer Color Message
+		if (messageGroupId == 60 && messageId == 10) {
+			if (command instanceof HSBType) {
+				ShcColor translateColor = translateColor((HSBType) command);
+				messageData = translateColor.toString();
+			} else if (command instanceof DecimalType){
+				int color = ((DecimalType) command).intValue();
+				color = color << 2;   // 6 bits
+				messageData = genHexString(color,2);
+			}
 		} else
-		// GPIO Digital Pin Message
-		if (messageGroupId == 1 && messageId == 5
+		// Dimmer Color Animation Message
+		if (messageGroupId == 60 && messageId == 11
 				&& command instanceof DecimalType) {
 			int setting = ((DecimalType) command).intValue();
-			setting = setting << 4;  // message data length = 4 bits
+			/* TODO: Right now only two time-color pairs are supported in
+			 * this implemenation. It is unclear to me how to handle 115 bits
+			 * that are required for the complete message consisting of 10
+			 * time-color pairs which gives an integer the size of 2^115
+			 */
+			setting = setting << 5;
 			messageData = Integer.toHexString(setting);
-		} else
-		// GPIO Digital Pin Timeout Message
-		if (messageGroupId == 1 && messageId == 6
-			&& command instanceof DecimalType) {
-			int setting = ((DecimalType) command).intValue();
-			setting = setting << 4;  // message data length = 20 bits
-			messageData = genHexString(setting, 5);
 		}
 		if (!"".equals(messageData)) {
 			cmd = "s0002" + genHexString(deviceID, 4)
 					+ genHexString(messageGroupId, 2)
-					+ genHexString(messageId, 2) + messageData + "\r";
+					+ genHexString(messageId, 2) + messageData;
 		}
+		return cmd;
+	}
+
+	public void sendCommand(int deviceID, int messageGroupId, int messageId,
+				int toggleTime, Command command) {
+		String cmd = prepareCommand(deviceID, messageGroupId, messageId, 
+				toggleTime, command);
 		if (cmd != "") {
 			logger.debug("send to serial port:" + cmd);
-			serialDevice.writeString(cmd);
+			serialDevice.writeString(cmd + "\r");
 		}
 	}
 

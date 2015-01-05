@@ -89,6 +89,18 @@ public class BaseStation implements SerialEventWorker {
 			}
 		} else
 		// Dimmer Brightness Message
+		if (messageGroupId == 60 && messageId == 11
+				&& command instanceof DecimalType) {
+			int setting = ((DecimalType) command).intValue();
+			/* TODO: Right now only two time-color pairs are supported in
+			 * this implemenation. It is unclear to me how to handle 115 bits
+			 * that are required for the complete message consisting of 10
+			 * time-color pairs which gives an integer the size of 2^115
+			 */
+			setting = setting << 5;
+			messageData = Integer.toHexString(setting);
+		} else
+		// Dimmer Brightness Message
 		if (messageGroupId == 60 && messageId == 1
 				&& command instanceof DecimalType) {
 			int brightness = ((DecimalType) command).intValue();

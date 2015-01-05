@@ -485,6 +485,7 @@ public class TestSHCMessage {
 		Assert.assertEquals("StartBrightness", 100, ((DecimalType) values.get(2)).intValue());
 		Assert.assertEquals("EndBrightness", 0, ((DecimalType) values.get(3)).intValue());
 	}
+
 	/**
 	 * Test Daten sind Dimmer Color: 13 (typ)
 	 */
@@ -518,5 +519,51 @@ public class TestSHCMessage {
 		Assert.assertEquals(63, ((DecimalType) values.get(0)).intValue());
 	}
 
+	/**
+	 * Test Daten sind Dimmer Color Animation: (typ)
+	 */
+	@Test
+	public void testDimmerColorAnimationTyp() {
+		String message = "Packet Data: SenderID=12;PacketCounter=9417;MessageType=10;AckSenderID=0;AckPacketCounter=3031;Error=0;MessageGroupID=60;MessageID=11;MessageData=1230418000000000000000000000000000;";
+		SHCMessage shcMessage = new SHCMessage(message, packet);
+		List<Type> values = shcMessage.getData().getOpenHABTypes();
+		Assert.assertEquals("Repeat", 1, ((DecimalType) values.get(0)).intValue());
+		Assert.assertEquals("AutoReverse", OnOffType.OFF, ((OnOffType) values.get(1)));
+		Assert.assertEquals("Time0", 8, ((DecimalType) values.get(2)).intValue());
+		Assert.assertEquals("Color0", 48, ((DecimalType) values.get(3)).intValue());
+		Assert.assertEquals("Time1", 8, ((DecimalType) values.get(4)).intValue());
+		Assert.assertEquals("Color1", 12, ((DecimalType) values.get(5)).intValue());
+	}
 
+	/**
+	 * Test Daten sind Dimmer Color Animation: (min)
+	 */
+	@Test
+	public void testDimmerColorAnimationMin() {
+		String message = "Packet Data: SenderID=12;PacketCounter=9417;MessageType=10;AckSenderID=0;AckPacketCounter=3031;Error=0;MessageGroupID=60;MessageID=11;MessageData=0000000000000000000000000000000000;";
+		SHCMessage shcMessage = new SHCMessage(message, packet);
+		List<Type> values = shcMessage.getData().getOpenHABTypes();
+		Assert.assertEquals("Repeat", 0, ((DecimalType) values.get(0)).intValue());
+		Assert.assertEquals("AutoReverse", OnOffType.OFF, ((OnOffType) values.get(1)));
+		Assert.assertEquals("Time0", 0, ((DecimalType) values.get(2)).intValue());
+		Assert.assertEquals("Color0", 0, ((DecimalType) values.get(3)).intValue());
+		Assert.assertEquals("Time1", 0, ((DecimalType) values.get(4)).intValue());
+		Assert.assertEquals("Color1", 0, ((DecimalType) values.get(5)).intValue());
+	}
+
+	/**
+	 * Test Daten sind Dimmer Color Animation: (max)
+	 */
+	@Test
+	public void testDimmerColorAnimationMax() {
+		String message = "Packet Data: SenderID=12;PacketCounter=9417;MessageType=10;AckSenderID=0;AckPacketCounter=3031;Error=0;MessageGroupID=60;MessageID=11;MessageData=FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00;";
+		SHCMessage shcMessage = new SHCMessage(message, packet);
+		List<Type> values = shcMessage.getData().getOpenHABTypes();
+		Assert.assertEquals("Repeat", 15, ((DecimalType) values.get(0)).intValue());
+		Assert.assertEquals("AutoReverse", OnOffType.ON, ((OnOffType) values.get(1)));
+		Assert.assertEquals("Time0", 31, ((DecimalType) values.get(2)).intValue());
+		Assert.assertEquals("Color0", 63, ((DecimalType) values.get(3)).intValue());
+		Assert.assertEquals("Time1", 31, ((DecimalType) values.get(4)).intValue());
+		Assert.assertEquals("Color1", 63, ((DecimalType) values.get(5)).intValue());
+	}
 }

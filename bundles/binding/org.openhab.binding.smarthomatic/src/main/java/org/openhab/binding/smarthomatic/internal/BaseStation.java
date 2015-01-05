@@ -113,21 +113,32 @@ public class BaseStation implements SerialEventWorker {
 			int setting = ((DecimalType) command).intValue();
 			messageData = genHexString(setting, 8);
 		} else
-		// Powerswitch
-		if (messageId == 20) {
-			cmd = "s0002"
-					+ genHexString(deviceID, 4)
-					+ "14"
-					+ "01"
-					+ getToggleTime(toggleTime, command.toString().equals("ON"))
-					+ "\r";
+		// GPIO Digital Port Message
+		if (messageGroupId == 1 && messageId == 1
+				&& command instanceof DecimalType) {
+			int setting = ((DecimalType) command).intValue();
+			// message data length = 8 bits, no need to shift
+			messageData = genHexString(setting, 2);
+		} else
+		// GPIO Digital Pin Message
+		if (messageGroupId == 1 && messageId == 5
+				&& command instanceof DecimalType) {
+			int setting = ((DecimalType) command).intValue();
+			setting = setting << 4;  // message data length = 4 bits
+			messageData = Integer.toHexString(setting);
+		} else
+		// GPIO Digital Pin Timeout Message
+		if (messageGroupId == 1 && messageId == 6
+			&& command instanceof DecimalType) {
+			int setting = ((DecimalType) command).intValue();
+			setting = setting << 4;  // message data length = 20 bits
+			messageData = genHexString(setting, 5);
 		}
 		if (!"".equals(messageData)) {
 			cmd = "s0002" + genHexString(deviceID, 4)
 					+ genHexString(messageGroupId, 2)
 					+ genHexString(messageId, 2) + messageData + "\r";
 		}
-
 		if (cmd != "") {
 			logger.debug("send to serial port:" + cmd);
 			serialDevice.writeString(cmd);
